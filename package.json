@@ -1,0 +1,6 @@
+{
+  "name": "dresearch-planner-web",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node esbuild.config.mjs" }
+}
