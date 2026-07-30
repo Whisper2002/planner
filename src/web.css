@@ -343,6 +343,15 @@ body {
 
 .planner-web-mobile-create { display: none; }
 
+#planner .dr-planner-nav.is-period-integrated { gap: 0; }
+#planner .dr-planner-period-picker.is-period-integrated {
+  min-height: 34px;
+  margin-right: 0;
+  padding-right: 0;
+  border-right: 0;
+}
+#planner .dr-planner-nav-button[hidden] { display: none; }
+
 .planner-web .dr-dialog-backdrop {
   background: var(--dr-dialog-backdrop);
   backdrop-filter: blur(3px) saturate(96%);
@@ -583,28 +592,28 @@ body {
   #planner .dr-planner-controls {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
-    grid-template-areas:
-      "period period period"
-      "views nav actions";
-    gap: 3px 6px;
+    grid-template-areas: "views nav actions";
+    gap: 6px;
     margin-bottom: 10px;
     padding: 7px 9px;
   }
 
   #planner .dr-planner-segments {
     grid-area: views;
-    gap: 6px;
+    gap: 3px;
     justify-self: start;
   }
 
   #planner .dr-planner-nav {
     grid-area: nav;
     justify-self: center;
+    min-width: 0;
+    max-width: 100%;
   }
 
   #planner .dr-planner-period-picker {
-    grid-area: period;
-    width: 100%;
+    width: auto;
+    min-width: 0;
     max-width: 100%;
   }
 
@@ -692,14 +701,21 @@ body {
 
   #planner .dr-planner-period-picker .dr-planner-period-label {
     display: block;
-    max-width: clamp(110px, 42vw, 180px);
+    max-width: clamp(94px, 29vw, 150px);
+    padding-inline: 2px;
     overflow: hidden;
+    font-size: 12px;
     text-overflow: ellipsis;
   }
 
+  #planner .dr-planner-view-button { padding-inline: 3px; }
+  #planner .dr-planner-nav-button { min-width: 24px; padding-inline: 2px; }
+  #planner .dr-planner-nav-button.is-today { min-width: auto; padding-inline: 3px; font-size: 11px; }
+
   #planner .dr-planner-period-picker .dr-control-popover {
-    left: 0;
+    left: 50%;
     max-width: calc(100vw - 40px);
+    transform: translateX(-50%);
   }
 
   #planner .dr-time-slot { grid-template-columns: 50px minmax(0, 1fr); }

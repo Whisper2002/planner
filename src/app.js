@@ -58,10 +58,71 @@ const enhancePageHeader = () => {
   if (refresh) refreshSlot.replaceChildren(refresh);
   pageHeader?.remove();
 };
-const refreshPlanner = (snapshot) => { renderer.refresh(snapshot); enhancePageHeader(); enhanceMobileCreateActions(); };
+const parsePlannerDate = (value) => {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, month - 1, day, 12);
+};
+const plannerDateKey = (date) => {
+  const year = String(date.getFullYear()).padStart(4, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+const startOfPlannerWeek = (date) => {
+  const start = new Date(date);
+  start.setDate(start.getDate() - ((start.getDay() || 7) - 1));
+  return start;
+};
+const formatPlannerPeriod = (view, selected) => {
+  if (view === 'day') return `${selected.getMonth() + 1}月${selected.getDate()}日 · 周${'日一二三四五六'[selected.getDay()]}`;
+  if (view === 'month') return `${selected.getFullYear()}年${selected.getMonth() + 1}月`;
+  const start = startOfPlannerWeek(selected);
+  const end = new Date(start); end.setDate(start.getDate() + 6);
+  if (start.getFullYear() !== end.getFullYear()) return `${start.getFullYear()}年${start.getMonth() + 1}月${start.getDate()}日—${end.getFullYear()}年${end.getMonth() + 1}月${end.getDate()}日`;
+  if (start.getMonth() === end.getMonth()) return `${start.getMonth() + 1}月${start.getDate()}日—${end.getDate()}日`;
+  return `${start.getMonth() + 1}月${start.getDate()}日—${end.getMonth() + 1}月${end.getDate()}日`;
+};
+const enhancePeriodNavigation = (snapshot) => {
+  const controls = document.querySelector('#planner .dr-planner-controls');
+  const nav = controls?.querySelector(':scope > .dr-planner-nav');
+  const period = controls?.querySelector(':scope > .dr-planner-period-picker') ?? nav?.querySelector(':scope > .dr-planner-period-picker');
+  const today = nav?.querySelector(':scope > .dr-planner-nav-button.is-today');
+  const arrows = nav ? [...nav.querySelectorAll(':scope > .dr-planner-nav-button:not(.is-today)')] : [];
+  const [previous, next] = arrows;
+  if (!controls || !nav || !period || !today || !previous || !next) return;
+
+  nav.classList.add('is-period-integrated');
+  period.classList.add('is-period-integrated');
+  if (previous.nextElementSibling !== period) previous.after(period);
+  if (period.nextElementSibling !== next) period.after(next);
+  if (next.nextElementSibling !== today) next.after(today);
+
+  const selected = parsePlannerDate(snapshot.ui.selectedDate);
+  const now = new Date(snapshot.now);
+  const current = snapshot.ui.view === 'day'
+    ? plannerDateKey(selected) === plannerDateKey(now)
+    : snapshot.ui.view === 'week'
+      ? plannerDateKey(startOfPlannerWeek(selected)) === plannerDateKey(startOfPlannerWeek(now))
+      : selected.getFullYear() === now.getFullYear() && selected.getMonth() === now.getMonth();
+  const shortcut = snapshot.ui.view === 'day' ? '今天' : snapshot.ui.view === 'week' ? '本周' : '本月';
+  const label = formatPlannerPeriod(snapshot.ui.view, selected);
+  const trigger = period.querySelector('.dr-planner-period-label');
+  if (trigger && trigger.textContent !== label) trigger.textContent = label;
+  if (trigger) trigger.setAttribute('aria-label', `选择日期，当前${label}`);
+  if (today.textContent !== shortcut) today.textContent = shortcut;
+  today.hidden = current;
+};
+let latestPlannerSnapshot = session.getSnapshot();
+const refreshPlanner = (snapshot) => {
+  latestPlannerSnapshot = snapshot;
+  renderer.refresh(snapshot);
+  enhancePageHeader();
+  enhancePeriodNavigation(snapshot);
+  enhanceMobileCreateActions();
+};
 const plannerRoot = document.querySelector('#planner');
 renderer.mount(plannerRoot);
-const plannerObserver = new MutationObserver(() => { enhancePageHeader(); enhanceMobileCreateActions(); });
+const plannerObserver = new MutationObserver(() => { enhancePageHeader(); enhancePeriodNavigation(latestPlannerSnapshot); enhanceMobileCreateActions(); });
 plannerObserver.observe(plannerRoot, { childList: true });
 const unsubscribe = session.subscribe(refreshPlanner); refreshPlanner(session.getSnapshot());
 
