@@ -46,7 +46,15 @@ body {
 .planner-web-brand-group {
   display: flex;
   align-items: center;
+  gap: 9px;
   min-width: 0;
+}
+
+.planner-web-brand-icon {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 7px;
 }
 
 .planner-web-brand {
@@ -342,6 +350,7 @@ body {
 }
 
 .planner-web .dr-dialog-backdrop > .dr-dialog {
+  container-type: inline-size;
   width: clamp(500px, 42vw, 560px);
   max-width: calc(100vw - 40px);
   max-height: min(720px, calc(100dvh - 40px));
@@ -353,6 +362,52 @@ body {
   box-shadow: var(--dr-shadow);
   backdrop-filter: var(--dr-glass-filter);
   -webkit-backdrop-filter: var(--dr-glass-filter);
+}
+
+.planner-web .dr-dialog .dr-control-popover {
+  width: 100%;
+  min-width: 0;
+  max-width: min(calc(100cqw - 40px), calc(100vw - 32px));
+  max-height: min(300px, calc(100dvh - 96px));
+}
+
+.planner-web .dr-dialog :is(.dr-date-popover, .dr-datetime-local-popover) {
+  width: clamp(210px, 100%, 252px);
+}
+
+@media (max-height: 600px) {
+  .planner-web .dr-dialog :is(.dr-date-popover, .dr-datetime-local-popover) {
+    padding: 6px;
+  }
+
+  .planner-web .dr-dialog .dr-calendar-head {
+    grid-template-columns: 28px minmax(0, 1fr) 28px;
+    gap: 4px;
+    margin-bottom: 3px;
+  }
+
+  .planner-web .dr-dialog .dr-calendar-nav {
+    width: 28px;
+    height: 28px;
+  }
+
+  .planner-web .dr-dialog .dr-calendar-weekdays {
+    margin-bottom: 2px;
+  }
+
+  .planner-web .dr-dialog .dr-calendar-weekdays span {
+    padding-block: 2px;
+  }
+
+  .planner-web .dr-dialog .dr-calendar-day {
+    min-height: 23px;
+    aspect-ratio: auto;
+  }
+
+  .planner-web .dr-dialog .dr-calendar-actions {
+    margin-top: 4px;
+    padding-top: 4px;
+  }
 }
 
 .planner-web .dr-dialog:focus,
@@ -453,10 +508,20 @@ body {
 
   .planner-web-brand-group {
     display: grid;
+    grid-template-columns: 28px minmax(0, 1fr);
+    grid-template-rows: auto auto;
     gap: 1px;
   }
 
+  .planner-web-brand-icon {
+    grid-row: 1 / span 2;
+    grid-column: 1;
+    align-self: center;
+  }
+
   .planner-web-brand {
+    grid-row: 1;
+    grid-column: 2;
     overflow: hidden;
     max-width: 44vw;
     font-size: 13px;
@@ -464,6 +529,8 @@ body {
   }
 
   .planner-web-page-context {
+    grid-row: 2;
+    grid-column: 2;
     margin-left: 0;
     padding-left: 0;
     border-left: 0;
@@ -556,16 +623,16 @@ body {
   }
 
   #planner .planner-web-create-trigger {
-    min-width: 86px;
+    min-width: auto;
     min-height: 34px;
-    padding: 5px 12px;
-    border: 1px solid var(--dr-glass-border);
-    border-radius: var(--dr-radius-sm);
+    padding: 5px 4px;
+    border: 0;
+    border-radius: 0;
     color: var(--dr-text);
-    background: color-mix(in srgb, var(--dr-surface-fallback) 84%, transparent);
-    box-shadow: var(--dr-shadow-subtle);
-    backdrop-filter: var(--dr-glass-filter);
-    -webkit-backdrop-filter: var(--dr-glass-filter);
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     font: inherit;
     font-size: 13px;
     font-weight: 650;
