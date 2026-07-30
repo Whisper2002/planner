@@ -515,28 +515,29 @@ body {
 
   #planner .dr-planner-controls {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas:
-      "period nav"
-      "views actions";
-    gap: 3px 8px;
+      "period period period"
+      "views nav actions";
+    gap: 3px 6px;
     margin-bottom: 10px;
     padding: 7px 9px;
   }
 
   #planner .dr-planner-segments {
     grid-area: views;
-    gap: 9px;
+    gap: 6px;
+    justify-self: start;
   }
 
   #planner .dr-planner-nav {
     grid-area: nav;
-    justify-self: end;
+    justify-self: center;
   }
 
   #planner .dr-planner-period-picker {
     grid-area: period;
-    width: min-content;
+    width: 100%;
     max-width: 100%;
   }
 
@@ -561,8 +562,10 @@ body {
     border: 1px solid var(--dr-glass-border);
     border-radius: var(--dr-radius-sm);
     color: var(--dr-text);
-    background: var(--dr-surface-muted);
-    box-shadow: none;
+    background: color-mix(in srgb, var(--dr-surface-fallback) 84%, transparent);
+    box-shadow: var(--dr-shadow-subtle);
+    backdrop-filter: var(--dr-glass-filter);
+    -webkit-backdrop-filter: var(--dr-glass-filter);
     font: inherit;
     font-size: 13px;
     font-weight: 650;
@@ -579,10 +582,10 @@ body {
     overflow: hidden;
     border: 1px solid var(--dr-glass-border);
     border-radius: var(--dr-radius-md);
-    background: color-mix(in srgb, var(--dr-surface-strong) 92%, transparent);
+    background: color-mix(in srgb, var(--dr-surface-fallback) 95%, transparent);
     box-shadow: var(--dr-shadow);
-    backdrop-filter: var(--dr-glass-filter);
-    -webkit-backdrop-filter: var(--dr-glass-filter);
+    backdrop-filter: blur(22px) saturate(106%);
+    -webkit-backdrop-filter: blur(22px) saturate(106%);
   }
 
   #planner .planner-web-create-menu[hidden] { display: none; }
