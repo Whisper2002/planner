@@ -48,8 +48,22 @@ const enhanceMobileCreateActions = () => {
   addChoice('安排日程', '安排明确的时间段', scheduleAction);
   trigger.addEventListener('click', () => { menu.hidden = !menu.hidden; trigger.setAttribute('aria-expanded', String(!menu.hidden)); });
 };
-const refreshPlanner = (snapshot) => { renderer.refresh(snapshot); enhanceMobileCreateActions(); };
-renderer.mount(document.querySelector('#planner')); const unsubscribe = session.subscribe(refreshPlanner); refreshPlanner(session.getSnapshot());
+const enhancePageHeader = () => {
+  const pageHeader = document.querySelector('#planner > .dr-page-header');
+  const heading = pageHeader?.querySelector('.dr-page-heading');
+  const refresh = pageHeader?.querySelector('.dr-header-actions > .dr-icon-button:not(.dr-planner-sync)');
+  const contextSlot = document.querySelector('#planner-page-context');
+  const refreshSlot = document.querySelector('#planner-refresh-slot');
+  if (heading) contextSlot.replaceChildren(heading);
+  if (refresh) refreshSlot.replaceChildren(refresh);
+  pageHeader?.remove();
+};
+const refreshPlanner = (snapshot) => { renderer.refresh(snapshot); enhancePageHeader(); enhanceMobileCreateActions(); };
+const plannerRoot = document.querySelector('#planner');
+renderer.mount(plannerRoot);
+const plannerObserver = new MutationObserver(() => { enhancePageHeader(); enhanceMobileCreateActions(); });
+plannerObserver.observe(plannerRoot, { childList: true });
+const unsubscribe = session.subscribe(refreshPlanner); refreshPlanner(session.getSnapshot());
 
 const token = document.querySelector('#sync-token'); const gist = document.querySelector('#sync-gist'); const status = document.querySelector('#sync-status'); const statusDetail = document.querySelector('#sync-status-detail'); const syncNow = document.querySelector('#sync-now'); const syncAction = document.querySelector('#sync-action'); const createGist = document.querySelector('#sync-create'); token.value = config.token; gist.value = config.gistId;
 const setSyncStatus = ({ summary, detail = summary, state = 'idle', action = '同步' }) => {
@@ -86,4 +100,4 @@ sync.subscribe((value) => {
   else setSyncStatus({ summary: '尚未同步', detail: '同步配置已就绪，尚未完成首次同步', state: 'idle' });
 });
 addEventListener('online', () => sync.schedule(200)); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') sync.schedule(200); });
-addEventListener('beforeunload', () => { unsubscribe(); session.dispose(); renderer.dispose(); sync.stop(); dialogHost.dispose(); });
+addEventListener('beforeunload', () => { plannerObserver.disconnect(); unsubscribe(); session.dispose(); renderer.dispose(); sync.stop(); dialogHost.dispose(); });

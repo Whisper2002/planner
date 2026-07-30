@@ -36,11 +36,46 @@ body {
   -webkit-backdrop-filter: blur(18px) saturate(110%);
 }
 
+.planner-web-brand-group {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
 .planner-web-brand {
   color: var(--dr-text);
   font-size: 14px;
   letter-spacing: -.01em;
   white-space: nowrap;
+}
+
+.planner-web-page-context {
+  min-width: 0;
+  margin-left: 16px;
+  padding-left: 16px;
+  border-left: 1px solid var(--dr-border);
+}
+
+.planner-web-page-context .dr-page-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.planner-web-page-context .dr-page-date {
+  overflow: hidden;
+  color: var(--dr-text);
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.planner-web-page-context .dr-page-subtitle {
+  flex: 0 0 auto;
+  font-size: 10px;
 }
 
 .planner-web-sync-summary {
@@ -49,6 +84,23 @@ body {
   gap: 6px;
   min-width: 0;
   margin-left: auto;
+}
+
+.planner-web-refresh-slot { display: flex; }
+
+.planner-web-refresh-slot .dr-icon-button {
+  min-height: 30px;
+  padding: 4px 8px;
+  border: 0;
+  color: var(--dr-text-muted);
+  background: transparent;
+  box-shadow: none;
+  font-size: 11px;
+}
+
+.planner-web-refresh-slot .dr-icon-button:hover {
+  color: var(--dr-text);
+  background: color-mix(in srgb, var(--dr-surface-muted) 72%, transparent);
 }
 
 .planner-web-sync-button {
@@ -159,16 +211,19 @@ body {
 }
 
 .planner-web-sync-panel {
+  box-sizing: border-box;
   position: absolute;
   top: 62px;
   right: 18px;
   z-index: 300;
   display: grid;
-  gap: 14px;
-  width: min(420px, calc(100vw - 36px));
-  padding: 18px;
+  gap: 12px;
+  width: min(360px, calc(100vw - 32px));
+  padding: 16px;
   background: rgb(238 241 239 / 88%);
 }
+
+.planner-web-sync-panel * { box-sizing: border-box; }
 
 .planner-web-sync-panel[hidden] { display: none; }
 
@@ -212,7 +267,11 @@ body {
   font-size: 12px;
 }
 
-.planner-web-sync-panel input { width: 100%; }
+.planner-web-sync-panel input {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
 
 .planner-web-close-button {
   display: grid;
@@ -240,25 +299,6 @@ body {
 
 #planner .dr-workspace-switch { display: none; }
 #planner .dr-planner-sync { display: none; }
-#planner > .dr-page-header {
-  flex: 0 0 auto;
-  min-height: 50px;
-  margin-bottom: 10px;
-  padding-inline: 2px;
-}
-#planner .dr-page-date {
-  color: var(--dr-text);
-  font-size: 17px;
-  letter-spacing: 0;
-}
-#planner .dr-page-subtitle { font-size: 11px; }
-#planner .dr-page-header .dr-icon-button {
-  min-height: 32px;
-  padding: 5px 10px;
-  border: 1px solid var(--dr-glass-border);
-  background: color-mix(in srgb, var(--dr-surface-strong) 54%, transparent);
-  box-shadow: none;
-}
 #planner :is(.dr-schedule-card, .dr-week-schedule, .dr-week-series-span) { cursor: pointer; }
 #planner .dr-schedule-resize { display: none; }
 
@@ -356,11 +396,29 @@ body {
     padding-inline: max(12px, env(safe-area-inset-left));
   }
 
+  .planner-web-brand-group {
+    display: grid;
+    gap: 1px;
+  }
+
   .planner-web-brand {
     overflow: hidden;
     max-width: 44vw;
     font-size: 13px;
     text-overflow: ellipsis;
+  }
+
+  .planner-web-page-context {
+    margin-left: 0;
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .planner-web-page-context .dr-page-heading { display: block; }
+  .planner-web-page-context .dr-page-date { display: none; }
+  .planner-web-page-context .dr-page-subtitle {
+    display: block;
+    font-size: 9px;
   }
 
   .planner-web-sync-summary { gap: 2px; }
@@ -390,27 +448,6 @@ body {
     touch-action: pan-y pinch-zoom;
   }
 
-  #planner > .dr-page-header {
-    flex-wrap: nowrap;
-    min-height: 48px;
-    margin-bottom: 8px;
-    padding-inline: 2px;
-  }
-
-  #planner .dr-page-heading { min-width: 0; }
-  #planner .dr-page-date {
-    overflow: hidden;
-    width: auto;
-    font-size: 14px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-  #planner .dr-page-subtitle { font-size: 10px; }
-  #planner .dr-header-actions {
-    flex: 0 0 auto;
-    width: auto;
-  }
-
   #planner :is(.dr-planner-page, .dr-planner-viewport, .dr-planner-day-layout, .dr-day-timeline, .dr-week-layout, .dr-week-calendar, .dr-month-layout, .dr-month-calendar, .dr-planner-side, .dr-week-side, .dr-month-side) {
     max-width: 100%;
     overflow-x: hidden !important;
@@ -421,19 +458,12 @@ body {
   #planner .dr-planner-viewport { overflow-y: auto !important; }
   #planner :is(button, input, textarea, [role='button']) { touch-action: manipulation; }
 
-  #planner .dr-page-header .dr-icon-button {
-    display: inline-flex;
-    min-height: 30px;
-    padding-inline: 8px;
-    font-size: 11px;
-  }
-
   #planner .dr-planner-controls {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-      "views nav"
-      "period actions";
+      "period nav"
+      "views actions";
     gap: 3px 8px;
     margin-bottom: 10px;
     padding: 7px 9px;
