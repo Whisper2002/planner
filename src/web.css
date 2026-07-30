@@ -148,6 +148,8 @@ body {
 
 #planner .dr-workspace-switch { display: none; }
 #planner .dr-planner-sync { display: none; }
+#planner :is(.dr-schedule-card, .dr-week-schedule, .dr-week-series-span) { cursor: pointer; }
+#planner .dr-schedule-resize { display: none; }
 
 .planner-web-mobile-create { display: none; }
 
