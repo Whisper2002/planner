@@ -62,12 +62,6 @@ const parsePlannerDate = (value) => {
   const [year, month, day] = value.split('-').map(Number);
   return new Date(year, month - 1, day, 12);
 };
-const plannerDateKey = (date) => {
-  const year = String(date.getFullYear()).padStart(4, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
 const startOfPlannerWeek = (date) => {
   const start = new Date(date);
   start.setDate(start.getDate() - ((start.getDay() || 7) - 1));
@@ -98,19 +92,11 @@ const enhancePeriodNavigation = (snapshot) => {
   if (next.nextElementSibling !== today) next.after(today);
 
   const selected = parsePlannerDate(snapshot.ui.selectedDate);
-  const now = new Date(snapshot.now);
-  const current = snapshot.ui.view === 'day'
-    ? plannerDateKey(selected) === plannerDateKey(now)
-    : snapshot.ui.view === 'week'
-      ? plannerDateKey(startOfPlannerWeek(selected)) === plannerDateKey(startOfPlannerWeek(now))
-      : selected.getFullYear() === now.getFullYear() && selected.getMonth() === now.getMonth();
-  const shortcut = snapshot.ui.view === 'day' ? '今天' : snapshot.ui.view === 'week' ? '本周' : '本月';
   const label = formatPlannerPeriod(snapshot.ui.view, selected);
   const trigger = period.querySelector('.dr-planner-period-label');
   if (trigger && trigger.textContent !== label) trigger.textContent = label;
   if (trigger) trigger.setAttribute('aria-label', `选择日期，当前${label}`);
-  if (today.textContent !== shortcut) today.textContent = shortcut;
-  today.hidden = current;
+  today.hidden = true;
 };
 let latestPlannerSnapshot = session.getSnapshot();
 const refreshPlanner = (snapshot) => {

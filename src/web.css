@@ -350,6 +350,20 @@ body {
   padding-right: 0;
   border-right: 0;
 }
+#planner .dr-planner-period-picker.is-period-integrated .dr-planner-period-label {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+#planner .dr-planner-period-picker.is-period-integrated .dr-planner-period-label:is(:hover, :focus-visible, [aria-expanded='true']) {
+  color: var(--dr-primary-strong);
+  background: transparent;
+  box-shadow: none;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
 #planner .dr-planner-nav-button[hidden] { display: none; }
 
 .planner-web .dr-dialog-backdrop {
