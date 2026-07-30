@@ -51,7 +51,17 @@ const enhanceMobileCreateActions = () => {
 const refreshPlanner = (snapshot) => { renderer.refresh(snapshot); enhanceMobileCreateActions(); };
 renderer.mount(document.querySelector('#planner')); const unsubscribe = session.subscribe(refreshPlanner); refreshPlanner(session.getSnapshot());
 
-const token = document.querySelector('#sync-token'); const gist = document.querySelector('#sync-gist'); const status = document.querySelector('#sync-status'); const createGist = document.querySelector('#sync-create'); token.value = config.token; gist.value = config.gistId;
+const token = document.querySelector('#sync-token'); const gist = document.querySelector('#sync-gist'); const status = document.querySelector('#sync-status'); const statusDetail = document.querySelector('#sync-status-detail'); const syncNow = document.querySelector('#sync-now'); const syncAction = document.querySelector('#sync-action'); const createGist = document.querySelector('#sync-create'); token.value = config.token; gist.value = config.gistId;
+const setSyncStatus = ({ summary, detail = summary, state = 'idle', action = '同步' }) => {
+  status.textContent = summary;
+  statusDetail.textContent = detail;
+  syncAction.textContent = action;
+  syncAction.hidden = !action;
+  syncNow.className = `planner-web-sync-button is-${state}`;
+  statusDetail.parentElement.className = `planner-web-sync-detail is-${state}`;
+  syncNow.title = detail;
+  syncNow.setAttribute('aria-label', `${summary}。${action || detail}`);
+};
 const updateCreateGistVisibility = () => { createGist.hidden = Boolean(gist.value.trim()); };
 gist.addEventListener('input', updateCreateGistVisibility); updateCreateGistVisibility();
 const settings = document.querySelector('#sync-settings'); const settingsToggle = document.querySelector('#sync-settings-toggle');
@@ -59,9 +69,21 @@ const setSettingsOpen = (open) => { settings.hidden = !open; settingsToggle.setA
 settingsToggle.addEventListener('click', () => setSettingsOpen(settings.hidden));
 document.querySelector('#sync-settings-close').addEventListener('click', () => setSettingsOpen(false));
 const saveConfig = () => { config.token = token.value.trim(); config.gistId = gist.value.trim(); localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); };
-document.querySelector('#sync-save').addEventListener('click', () => { saveConfig(); status.textContent = '配置已保存'; setSettingsOpen(false); if (config.token && config.gistId) sync.schedule(0); });
-createGist.addEventListener('click', async () => { try { saveConfig(); config.gistId = await sync.createRemote(); gist.value = config.gistId; updateCreateGistVisibility(); localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); status.textContent = '已新建 Secret Gist'; } catch (error) { status.textContent = `新建失败：${error.message}`; } });
-document.querySelector('#sync-now').addEventListener('click', async () => { try { saveConfig(); await sync.sync(); } catch {} });
-sync.subscribe((value) => { status.textContent = value.state === 'syncing' ? '正在同步…' : value.state === 'error' ? `同步失败：${value.error}` : value.lastSyncedAt ? `${new Date(value.lastSyncedAt).toLocaleString('zh-CN')} 已同步` : '尚未同步'; });
+document.querySelector('#sync-save').addEventListener('click', () => { saveConfig(); setSyncStatus({ summary: '配置已保存', detail: '同步配置已保存在当前浏览器', state: 'idle' }); setSettingsOpen(false); if (config.token && config.gistId) sync.schedule(0); });
+createGist.addEventListener('click', async () => { try { saveConfig(); config.gistId = await sync.createRemote(); gist.value = config.gistId; updateCreateGistVisibility(); localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); setSyncStatus({ summary: 'Gist 已创建', detail: '已新建 Secret Gist', state: 'success' }); } catch (error) { setSyncStatus({ summary: '创建失败', detail: `新建失败：${error.message}`, state: 'error', action: '重试' }); } });
+syncNow.addEventListener('click', async () => {
+  saveConfig();
+  if (!config.token || !config.gistId) { setSettingsOpen(true); return; }
+  try { await sync.sync(); } catch {}
+});
+sync.subscribe((value) => {
+  if (value.state === 'syncing') setSyncStatus({ summary: '正在同步', detail: '正在同步 Planner 数据…', state: 'syncing', action: '' });
+  else if (value.state === 'error') setSyncStatus({ summary: '同步失败', detail: `同步失败：${value.error}`, state: 'error', action: '重试' });
+  else if (value.lastSyncedAt) {
+    const syncedAt = new Date(value.lastSyncedAt).toLocaleString('zh-CN');
+    setSyncStatus({ summary: '已同步', detail: `${syncedAt} 已同步`, state: 'success' });
+  } else if (!config.token || !config.gistId) setSyncStatus({ summary: '未配置同步', detail: '填写 Token 和 Gist ID 后即可同步', state: 'idle', action: '配置' });
+  else setSyncStatus({ summary: '尚未同步', detail: '同步配置已就绪，尚未完成首次同步', state: 'idle' });
+});
 addEventListener('online', () => sync.schedule(200)); document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') sync.schedule(200); });
 addEventListener('beforeunload', () => { unsubscribe(); session.dispose(); renderer.dispose(); sync.stop(); dialogHost.dispose(); });

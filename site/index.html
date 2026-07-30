@@ -12,9 +12,19 @@
       <header class="planner-web-header">
         <strong class="planner-web-brand">DResearch Planner</strong>
         <div class="planner-web-sync-summary">
-          <span id="sync-status" role="status">尚未同步</span>
-          <button id="sync-now" class="planner-web-quiet-button" type="button">同步</button>
-          <button id="sync-settings-toggle" class="planner-web-quiet-button" type="button" aria-expanded="false" aria-controls="sync-settings">同步设置</button>
+          <button id="sync-now" class="planner-web-sync-button is-idle" type="button">
+            <span class="planner-web-sync-indicator" aria-hidden="true"></span>
+            <span id="sync-status" role="status">尚未同步</span>
+            <span id="sync-action" class="planner-web-sync-action">同步</span>
+          </button>
+          <button id="sync-settings-toggle" class="planner-web-settings-button" type="button" aria-label="同步设置" title="同步设置" aria-expanded="false" aria-controls="sync-settings">
+            <svg aria-hidden="true" viewBox="0 0 20 20">
+              <path d="M3 5h8m3 0h3M3 10h3m3 0h8M3 15h7m3 0h4"/>
+              <circle cx="12.5" cy="5" r="1.5"/>
+              <circle cx="7.5" cy="10" r="1.5"/>
+              <circle cx="11.5" cy="15" r="1.5"/>
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -25,6 +35,10 @@
             <p>配置只保存在当前浏览器中。</p>
           </div>
           <button id="sync-settings-close" class="planner-web-close-button" type="button" aria-label="关闭同步设置">×</button>
+        </div>
+        <div class="planner-web-sync-detail">
+          <span class="planner-web-sync-indicator" aria-hidden="true"></span>
+          <span id="sync-status-detail">尚未同步</span>
         </div>
         <label>
           <span>GitHub Token</span>

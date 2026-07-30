@@ -27,11 +27,11 @@ body {
   z-index: 200;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   min-width: 0;
   padding: 0 max(18px, env(safe-area-inset-right)) 0 max(18px, env(safe-area-inset-left));
   border-bottom: 1px solid rgb(73 84 87 / 12%);
-  background: rgb(242 244 243 / 72%);
+  background: rgb(242 244 243 / 82%);
   backdrop-filter: blur(18px) saturate(110%);
   -webkit-backdrop-filter: blur(18px) saturate(110%);
 }
@@ -46,18 +46,95 @@ body {
 .planner-web-sync-summary {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   min-width: 0;
   margin-left: auto;
 }
 
-.planner-web-sync-summary #sync-status {
-  overflow: hidden;
-  max-width: min(36vw, 360px);
+.planner-web-sync-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 30px;
+  padding: 4px 9px;
+  border: 1px solid transparent;
+  border-radius: 999px;
   color: var(--dr-text-muted);
+  background: transparent;
+  box-shadow: none;
+  font: inherit;
   font-size: 11px;
-  text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
+}
+
+.planner-web-sync-button:hover {
+  color: var(--dr-text);
+  border-color: var(--dr-glass-border);
+  background: color-mix(in srgb, var(--dr-surface-muted) 72%, transparent);
+}
+
+.planner-web-sync-indicator {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dr-text-muted);
+  opacity: .55;
+}
+
+.planner-web-sync-button.is-success .planner-web-sync-indicator,
+.planner-web-sync-detail.is-success .planner-web-sync-indicator { background: var(--dr-success); opacity: 1; }
+.planner-web-sync-button.is-error .planner-web-sync-indicator,
+.planner-web-sync-detail.is-error .planner-web-sync-indicator { background: var(--dr-danger); opacity: 1; }
+.planner-web-sync-button.is-syncing .planner-web-sync-indicator,
+.planner-web-sync-detail.is-syncing .planner-web-sync-indicator {
+  background: var(--dr-primary);
+  opacity: 1;
+  animation: planner-web-sync-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes planner-web-sync-pulse {
+  50% { opacity: .35; transform: scale(.82); }
+}
+
+.planner-web-sync-action {
+  padding-left: 7px;
+  border-left: 1px solid var(--dr-border);
+  color: var(--dr-text);
+  font-weight: 650;
+}
+
+.planner-web-settings-button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--dr-text-muted);
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.planner-web-settings-button:hover,
+.planner-web-settings-button[aria-expanded='true'] {
+  color: var(--dr-text);
+  background: color-mix(in srgb, var(--dr-surface-muted) 72%, transparent);
+}
+
+.planner-web-settings-button svg {
+  width: 17px;
+  height: 17px;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.35;
 }
 
 .planner-web-quiet-button,
@@ -113,6 +190,21 @@ body {
   font-size: 11px;
 }
 
+.planner-web-sync-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 10px;
+  border-left: 2px solid var(--dr-border);
+  color: var(--dr-text-muted);
+  background: color-mix(in srgb, var(--dr-surface-muted) 50%, transparent);
+  font-size: 11px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.planner-web-sync-detail .planner-web-sync-indicator { margin-top: 4px; }
+
 .planner-web-sync-panel label {
   display: grid;
   gap: 6px;
@@ -143,11 +235,30 @@ body {
   max-width: 1560px;
   min-width: 0;
   min-height: 0;
-  padding: 14px 18px 18px;
+  padding: 10px 18px 18px;
 }
 
 #planner .dr-workspace-switch { display: none; }
 #planner .dr-planner-sync { display: none; }
+#planner > .dr-page-header {
+  flex: 0 0 auto;
+  min-height: 50px;
+  margin-bottom: 10px;
+  padding-inline: 2px;
+}
+#planner .dr-page-date {
+  color: var(--dr-text);
+  font-size: 17px;
+  letter-spacing: 0;
+}
+#planner .dr-page-subtitle { font-size: 11px; }
+#planner .dr-page-header .dr-icon-button {
+  min-height: 32px;
+  padding: 5px 10px;
+  border: 1px solid var(--dr-glass-border);
+  background: color-mix(in srgb, var(--dr-surface-strong) 54%, transparent);
+  box-shadow: none;
+}
 #planner :is(.dr-schedule-card, .dr-week-schedule, .dr-week-series-span) { cursor: pointer; }
 #planner .dr-schedule-resize { display: none; }
 
@@ -241,21 +352,26 @@ body {
   }
 
   .planner-web-header {
-    gap: 8px;
+    gap: 10px;
     padding-inline: max(12px, env(safe-area-inset-left));
   }
 
-  .planner-web-brand { font-size: 13px; }
-
-  .planner-web-sync-summary { gap: 3px; }
-
-  .planner-web-sync-summary #sync-status {
-    max-width: 82px;
-    font-size: 10px;
+  .planner-web-brand {
+    overflow: hidden;
+    max-width: 44vw;
+    font-size: 13px;
+    text-overflow: ellipsis;
   }
 
-  .planner-web-quiet-button { padding-inline: 5px; }
-  #sync-now { display: none; }
+  .planner-web-sync-summary { gap: 2px; }
+  .planner-web-sync-button { gap: 6px; padding-inline: 7px; font-size: 10px; }
+  .planner-web-sync-button #sync-status {
+    overflow: hidden;
+    max-width: 78px;
+    text-overflow: ellipsis;
+  }
+  .planner-web-sync-action { display: none; }
+  .planner-web-settings-button { width: 28px; min-width: 28px; height: 28px; }
 
   .planner-web-sync-panel {
     top: 56px;
@@ -274,6 +390,27 @@ body {
     touch-action: pan-y pinch-zoom;
   }
 
+  #planner > .dr-page-header {
+    flex-wrap: nowrap;
+    min-height: 48px;
+    margin-bottom: 8px;
+    padding-inline: 2px;
+  }
+
+  #planner .dr-page-heading { min-width: 0; }
+  #planner .dr-page-date {
+    overflow: hidden;
+    width: auto;
+    font-size: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #planner .dr-page-subtitle { font-size: 10px; }
+  #planner .dr-header-actions {
+    flex: 0 0 auto;
+    width: auto;
+  }
+
   #planner :is(.dr-planner-page, .dr-planner-viewport, .dr-planner-day-layout, .dr-day-timeline, .dr-week-layout, .dr-week-calendar, .dr-month-layout, .dr-month-calendar, .dr-planner-side, .dr-week-side, .dr-month-side) {
     max-width: 100%;
     overflow-x: hidden !important;
@@ -284,7 +421,12 @@ body {
   #planner .dr-planner-viewport { overflow-y: auto !important; }
   #planner :is(button, input, textarea, [role='button']) { touch-action: manipulation; }
 
-  #planner .dr-page-header .dr-icon-button { display: none; }
+  #planner .dr-page-header .dr-icon-button {
+    display: inline-flex;
+    min-height: 30px;
+    padding-inline: 8px;
+    font-size: 11px;
+  }
 
   #planner .dr-planner-controls {
     display: grid;
