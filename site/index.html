@@ -1,1 +1,47 @@
-<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>DResearch Planner</title><link rel="stylesheet" href="app.css"></head><body><main class="planner-web dresearch-root" data-dr-theme="light"><header class="planner-web-sync"><strong>DResearch Planner</strong><input id="sync-token" class="dr-input" type="password" autocomplete="new-password" placeholder="GitHub Token"><input id="sync-gist" class="dr-input" type="text" placeholder="Secret Gist ID"><button id="sync-save" class="dr-button">保存配置</button><button id="sync-create" class="dr-button">新建 Gist</button><button id="sync-now" class="dr-primary-button">立即同步</button><span id="sync-status">尚未同步</span></header><section id="planner" class="dr-page-panel is-active"></section></main><script type="module" src="app.js"></script></body></html>
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="color-scheme" content="light">
+    <title>DResearch Planner</title>
+    <link rel="stylesheet" href="app.css">
+  </head>
+  <body>
+    <main class="planner-web dresearch-root" data-dr-theme="light">
+      <header class="planner-web-header">
+        <strong class="planner-web-brand">DResearch Planner</strong>
+        <div class="planner-web-sync-summary">
+          <span id="sync-status" role="status">尚未同步</span>
+          <button id="sync-now" class="planner-web-quiet-button" type="button">同步</button>
+          <button id="sync-settings-toggle" class="planner-web-quiet-button" type="button" aria-expanded="false" aria-controls="sync-settings">同步设置</button>
+        </div>
+      </header>
+
+      <section id="sync-settings" class="planner-web-sync-panel dr-card" aria-labelledby="sync-settings-title" hidden>
+        <div class="planner-web-sync-panel-head">
+          <div>
+            <h2 id="sync-settings-title">同步设置</h2>
+            <p>配置只保存在当前浏览器中。</p>
+          </div>
+          <button id="sync-settings-close" class="planner-web-close-button" type="button" aria-label="关闭同步设置">×</button>
+        </div>
+        <label>
+          <span>GitHub Token</span>
+          <input id="sync-token" class="dr-input" type="password" autocomplete="new-password" placeholder="输入 Token">
+        </label>
+        <label>
+          <span>Secret Gist ID</span>
+          <input id="sync-gist" class="dr-input" type="text" autocomplete="off" placeholder="输入 Gist ID">
+        </label>
+        <div class="planner-web-sync-actions">
+          <button id="sync-create" class="dr-button" type="button">新建 Gist</button>
+          <button id="sync-save" class="dr-primary-button" type="button">保存配置</button>
+        </div>
+      </section>
+
+      <section id="planner" class="dr-page-panel is-active"></section>
+    </main>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

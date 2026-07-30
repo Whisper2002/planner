@@ -31,8 +31,12 @@ const renderer = new PlannerRenderer({ session, store, dialogHost, presentation,
 renderer.mount(document.querySelector('#planner')); const unsubscribe = session.subscribe((snapshot) => renderer.refresh(snapshot)); renderer.refresh(session.getSnapshot());
 
 const token = document.querySelector('#sync-token'); const gist = document.querySelector('#sync-gist'); const status = document.querySelector('#sync-status'); token.value = config.token; gist.value = config.gistId;
+const settings = document.querySelector('#sync-settings'); const settingsToggle = document.querySelector('#sync-settings-toggle');
+const setSettingsOpen = (open) => { settings.hidden = !open; settingsToggle.setAttribute('aria-expanded', String(open)); if (open) token.focus(); else settingsToggle.focus(); };
+settingsToggle.addEventListener('click', () => setSettingsOpen(settings.hidden));
+document.querySelector('#sync-settings-close').addEventListener('click', () => setSettingsOpen(false));
 const saveConfig = () => { config.token = token.value.trim(); config.gistId = gist.value.trim(); localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); };
-document.querySelector('#sync-save').addEventListener('click', () => { saveConfig(); status.textContent = '配置已保存在当前浏览器'; if (config.token && config.gistId) sync.schedule(0); });
+document.querySelector('#sync-save').addEventListener('click', () => { saveConfig(); status.textContent = '配置已保存'; setSettingsOpen(false); if (config.token && config.gistId) sync.schedule(0); });
 document.querySelector('#sync-create').addEventListener('click', async () => { try { saveConfig(); config.gistId = await sync.createRemote(); gist.value = config.gistId; localStorage.setItem(CONFIG_KEY, JSON.stringify(config)); status.textContent = '已新建 Secret Gist'; } catch (error) { status.textContent = `新建失败：${error.message}`; } });
 document.querySelector('#sync-now').addEventListener('click', async () => { try { saveConfig(); await sync.sync(); } catch {} });
 sync.subscribe((value) => { status.textContent = value.state === 'syncing' ? '正在同步…' : value.state === 'error' ? `同步失败：${value.error}` : value.lastSyncedAt ? `${new Date(value.lastSyncedAt).toLocaleString('zh-CN')} 已同步` : '尚未同步'; });
