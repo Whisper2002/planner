@@ -7,6 +7,7 @@ body {
 
 body {
   overflow: hidden;
+  overscroll-behavior-x: none;
   background: #e9eceb;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
 }
@@ -19,6 +20,7 @@ body {
   height: 100%;
   height: 100dvh;
   overflow: hidden;
+  overscroll-behavior-x: none;
 }
 
 .planner-web-header {
@@ -147,6 +149,35 @@ body {
 #planner .dr-workspace-switch { display: none; }
 #planner .dr-planner-sync { display: none; }
 
+.planner-web-mobile-create { display: none; }
+
+.planner-web .dr-dialog-backdrop > .dr-dialog {
+  box-sizing: border-box;
+  width: min(900px, calc(100vw - 40px));
+  max-height: min(760px, calc(100dvh - 40px));
+  overflow: hidden;
+}
+
+.planner-web .dr-dialog:focus,
+.planner-web .dr-dialog:focus-visible { outline: none; }
+
+.planner-web .dr-dialog .dr-form-grid {
+  max-height: calc(min(760px, 100dvh - 40px) - 40px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 1px;
+}
+
+.planner-web .dr-dialog .dr-form-head {
+  position: sticky;
+  top: -1px;
+  z-index: 10;
+  padding-block: 1px 10px;
+  background: color-mix(in srgb, var(--dr-surface-strong) 94%, transparent);
+  backdrop-filter: var(--dr-glass-filter);
+  -webkit-backdrop-filter: var(--dr-glass-filter);
+}
+
 @media (max-width: 900px) {
   #planner .dr-planner-day-layout,
   #planner .dr-week-layout,
@@ -192,8 +223,19 @@ body {
 }
 
 @media (max-width: 600px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+    touch-action: pan-y;
+  }
+
   .planner-web {
     grid-template-rows: 48px minmax(0, 1fr);
+    max-width: 100%;
+    overflow-x: hidden;
+    touch-action: pan-y;
   }
 
   .planner-web-header {
@@ -225,8 +267,20 @@ body {
 
   #planner {
     max-width: none;
+    overflow-x: hidden;
     padding: 10px 10px max(12px, env(safe-area-inset-bottom));
+    touch-action: pan-y;
   }
+
+  #planner :is(.dr-planner-page, .dr-planner-viewport, .dr-planner-day-layout, .dr-day-timeline, .dr-week-layout, .dr-week-calendar, .dr-month-layout, .dr-month-calendar, .dr-planner-side, .dr-week-side, .dr-month-side) {
+    max-width: 100%;
+    overflow-x: hidden !important;
+    overscroll-behavior-x: none;
+    touch-action: pan-y;
+  }
+
+  #planner .dr-planner-viewport { overflow-y: auto !important; }
+  #planner :is(button, input, textarea, [role='button']) { touch-action: manipulation; }
 
   #planner .dr-page-header .dr-icon-button { display: none; }
 
@@ -263,6 +317,64 @@ body {
     gap: 10px;
     margin-left: 0;
   }
+
+  #planner .dr-planner-actions > .dr-planner-create-action { display: none; }
+
+  #planner .planner-web-mobile-create {
+    position: relative;
+    display: block;
+  }
+
+  #planner .planner-web-create-trigger {
+    min-width: 86px;
+    min-height: 34px;
+    padding: 5px 12px;
+    border: 1px solid var(--dr-glass-border);
+    border-radius: var(--dr-radius-sm);
+    color: var(--dr-text);
+    background: var(--dr-surface-muted);
+    box-shadow: none;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    white-space: nowrap;
+  }
+
+  #planner .planner-web-create-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 220;
+    display: grid;
+    width: 210px;
+    overflow: hidden;
+    border: 1px solid var(--dr-glass-border);
+    border-radius: var(--dr-radius-md);
+    background: color-mix(in srgb, var(--dr-surface-strong) 92%, transparent);
+    box-shadow: var(--dr-shadow);
+    backdrop-filter: var(--dr-glass-filter);
+    -webkit-backdrop-filter: var(--dr-glass-filter);
+  }
+
+  #planner .planner-web-create-menu[hidden] { display: none; }
+
+  #planner .planner-web-create-choice {
+    display: grid;
+    gap: 3px;
+    min-height: 62px;
+    padding: 10px 14px;
+    border: 0;
+    border-bottom: 1px solid var(--dr-border);
+    border-radius: 0;
+    color: var(--dr-text);
+    background: transparent;
+    box-shadow: none;
+    text-align: left;
+  }
+
+  #planner .planner-web-create-choice:last-child { border-bottom: 0; }
+  #planner .planner-web-create-choice strong { font-size: 14px; }
+  #planner .planner-web-create-choice small { color: var(--dr-text-muted); font-size: 11px; }
 
   #planner .dr-planner-segments,
   #planner .dr-planner-nav,
@@ -324,11 +436,54 @@ body {
   #planner .dr-month-metrics span { gap: 2px; }
   #planner .dr-month-activity { right: 3px; bottom: 3px; left: 3px; }
 
-  .dr-dialog-backdrop { padding: 12px; }
-  .dr-dialog-backdrop > section {
-    width: min(100%, calc(100vw - 24px));
-    max-width: calc(100vw - 24px);
-    max-height: calc(100dvh - 24px);
+  .planner-web .dr-dialog-backdrop {
+    place-items: end center;
+    overflow: hidden;
+    padding: max(64px, env(safe-area-inset-top)) 0 0;
+    touch-action: pan-y;
+  }
+
+  .planner-web .dr-dialog-backdrop > .dr-dialog {
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - max(64px, env(safe-area-inset-top)));
+    padding: 18px 16px max(18px, env(safe-area-inset-bottom));
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 22px 22px 0 0;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .planner-web .dr-dialog .dr-form-grid {
+    max-height: calc(100dvh - max(64px, env(safe-area-inset-top)) - 36px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 1px 2px max(6px, env(safe-area-inset-bottom));
+    touch-action: pan-y;
+  }
+
+  .planner-web .dr-dialog .dr-form-head {
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+  }
+
+  .planner-web .dr-dialog .dr-form-head h2 { font-size: 20px; }
+
+  .planner-web .dr-dialog .dr-form-head .dr-form-actions {
+    gap: 4px;
+  }
+
+  .planner-web .dr-dialog .dr-form-head .dr-form-actions :is(.dr-button, .dr-primary-button) {
+    min-height: 34px;
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+
+  .planner-web .dr-dialog .dr-form-inline-row:is(.is-schedule-timing, .is-schedule-options, .is-task-timing, .is-task-schedule-time) {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .dr-month-detail-columns { grid-template-columns: minmax(0, 1fr); }

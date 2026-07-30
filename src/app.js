@@ -20,7 +20,7 @@ await sync.start();
 const presentation = createPresentation('zh-CN');
 const dialogHost = new DialogHost({ adapter: {
   captureFocus: () => document.activeElement,
-  createDialog() { const backdrop = document.body.appendChild(Object.assign(document.createElement('div'), { className: 'dr-dialog-backdrop' })); const dialog = backdrop.appendChild(document.createElement('section')); dialog.tabIndex = -1; return dialog; },
+  createDialog(id) { const backdrop = document.querySelector('.planner-web').appendChild(Object.assign(document.createElement('div'), { className: 'dr-dialog-backdrop' })); const dialog = backdrop.appendChild(document.createElement('section')); dialog.dataset.dialogId = id; dialog.tabIndex = -1; return dialog; },
   setAttributes(dialog, attributes) { for (const [name, value] of Object.entries(attributes)) dialog.setAttribute(name, value); },
   addKeyListener(listener) { document.addEventListener('keydown', listener); return () => document.removeEventListener('keydown', listener); },
   addBackdropListener(dialog, listener) { dialog.parentElement.addEventListener('click', listener); return () => dialog.parentElement?.removeEventListener('click', listener); },
@@ -28,7 +28,28 @@ const dialogHost = new DialogHost({ adapter: {
 } });
 const session = new PlannerSession({ store, initialUi: parse('dresearch-planner-web-ui', {}), onUiChanged: (ui) => localStorage.setItem('dresearch-planner-web-ui', JSON.stringify(ui)) });
 const renderer = new PlannerRenderer({ session, store, dialogHost, presentation, syncService: sync });
-renderer.mount(document.querySelector('#planner')); const unsubscribe = session.subscribe((snapshot) => renderer.refresh(snapshot)); renderer.refresh(session.getSnapshot());
+const enhanceMobileCreateActions = () => {
+  const actions = document.querySelector('#planner .dr-planner-actions');
+  if (!actions || actions.querySelector('.planner-web-mobile-create')) return;
+  const taskAction = actions.querySelector('.dr-planner-create-action:not(.is-schedule)');
+  const scheduleAction = actions.querySelector('.dr-planner-create-action.is-schedule');
+  if (!taskAction || !scheduleAction) return;
+  const mobile = actions.appendChild(Object.assign(document.createElement('div'), { className: 'planner-web-mobile-create' }));
+  const trigger = mobile.appendChild(Object.assign(document.createElement('button'), { className: 'planner-web-create-trigger', type: 'button', textContent: '＋ 新建' }));
+  trigger.setAttribute('aria-expanded', 'false');
+  const menu = mobile.appendChild(Object.assign(document.createElement('div'), { className: 'planner-web-create-menu', hidden: true }));
+  const addChoice = (title, description, source) => {
+    const choice = menu.appendChild(Object.assign(document.createElement('button'), { className: 'planner-web-create-choice', type: 'button' }));
+    choice.appendChild(Object.assign(document.createElement('strong'), { textContent: title }));
+    choice.appendChild(Object.assign(document.createElement('small'), { textContent: description }));
+    choice.addEventListener('click', () => { menu.hidden = true; trigger.setAttribute('aria-expanded', 'false'); source.click(); });
+  };
+  addChoice('添加任务', '记录需要完成的事项', taskAction);
+  addChoice('安排日程', '安排明确的时间段', scheduleAction);
+  trigger.addEventListener('click', () => { menu.hidden = !menu.hidden; trigger.setAttribute('aria-expanded', String(!menu.hidden)); });
+};
+const refreshPlanner = (snapshot) => { renderer.refresh(snapshot); enhanceMobileCreateActions(); };
+renderer.mount(document.querySelector('#planner')); const unsubscribe = session.subscribe(refreshPlanner); refreshPlanner(session.getSnapshot());
 
 const token = document.querySelector('#sync-token'); const gist = document.querySelector('#sync-gist'); const status = document.querySelector('#sync-status'); token.value = config.token; gist.value = config.gistId;
 const settings = document.querySelector('#sync-settings'); const settingsToggle = document.querySelector('#sync-settings-toggle');
